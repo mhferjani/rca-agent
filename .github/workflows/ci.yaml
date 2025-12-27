@@ -65,7 +65,7 @@ jobs:
       - run: |
           pip install -e ".[dev]"
           pytest tests/ --cov=src/rca_agent --cov-report=xml --cov-fail-under=50
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml
         env:
