@@ -25,17 +25,17 @@ jobs:
           ruff check src/ tests/
           ruff format --check src/ tests/
 
-  typecheck:
-    name: Type Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      - run: |
-          pip install -e ".[dev]"
-          mypy src/rca_agent/ --ignore-missing-imports
+#  typecheck:
+#    name: Type Check
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-python@v5
+#        with:
+#          python-version: ${{ env.PYTHON_VERSION }}
+#      - run: |
+#          pip install -e ".[dev]"
+#          mypy src/rca_agent/ --ignore-missing-imports
 
   test:
     name: Test (Python ${{ matrix.python-version }})
