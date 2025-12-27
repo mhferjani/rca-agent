@@ -160,7 +160,7 @@ def demo(
 
     console.print(
         Panel.fit(
-            f"[bold blue]Running demo scenario[/bold blue]\n" f"Scenario: {scenario}",
+            f"[bold blue]Running demo scenario[/bold blue]\nScenario: {scenario}",
             title="🎮 RCA Agent Demo",
         )
     )
