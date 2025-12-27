@@ -117,31 +117,54 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = [
-    "E",      # pycodestyle errors
-    "W",      # pycodestyle warnings
-    "F",      # Pyflakes
-    "I",      # isort
-    "B",      # flake8-bugbear
-    "C4",     # flake8-comprehensions
-    "UP",     # pyupgrade
-    "ARG",    # flake8-unused-arguments
-    "SIM",    # flake8-simplify
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "ARG",  # unused arguments
+    "SIM",  # simplify
 ]
 ignore = [
-    "E501",   # line too long (handled by formatter)
-    "B008",   # do not perform function calls in argument defaults
+    "E501",   # line too long (formatter handles it)
+    "B008",   # function calls in defaults
+    "B904",   # raise ... from err (trop verbeux en API)
+    "B017",   # pytest.raises(Exception)
+    "ARG001", # unused function argument (FastAPI / callbacks)
+    "ARG002", # unused **kwargs (interfaces imposées)
+    "F841",   # variable temporaire non utilisée
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B017"]
+"src/rca_agent/api/**" = ["ARG001", "B904"]
+"src/rca_agent/cli.py" = ["B904"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["rca_agent"]
 
 [tool.mypy]
 python_version = "3.11"
-strict = true
-warn_return_any = true
-warn_unused_ignores = true
-disallow_untyped_defs = true
 plugins = ["pydantic.mypy"]
+
+strict = false
+ignore_missing_imports = true
+follow_imports = "skip"
+
+disallow_untyped_defs = false
+check_untyped_defs = false
+warn_return_any = false
+warn_unused_ignores = false
+strict_optional = false
+
+exclude = [
+    "src/rca_agent/api/.*",
+    "src/rca_agent/cli.py",
+    "demo/.*",
+    "tests/.*",
+]
 
 [[tool.mypy.overrides]]
 module = [

@@ -130,8 +130,8 @@ class RCAContext(BaseModel):
 - Task: {self.task.task_id}
 - State: {self.task.state}
 - Try: {self.task.try_number}/{self.task.max_tries}
-- Duration: {self.task.duration_seconds or 'N/A'}s
-- Operator: {self.task.operator or 'unknown'}""")
+- Duration: {self.task.duration_seconds or "N/A"}s
+- Operator: {self.task.operator or "unknown"}""")
 
         # Logs
         log_content = self.logs.error_snippet or self.logs.stdout[-2000:]
@@ -146,10 +146,10 @@ class RCAContext(BaseModel):
                 f"{r.get('state', 'unknown')}" for r in self.dag_history.recent_runs[:5]
             )
             sections.append(f"""## DAG History
-- Last success: {self.dag_history.last_success or 'Never'}
+- Last success: {self.dag_history.last_success or "Never"}
 - Recent runs: [{runs_summary}]
 - Failure rate (7d): {self.dag_history.failure_rate_7d:.1%}
-- Avg duration: {self.dag_history.avg_duration_seconds or 'N/A'}s""")
+- Avg duration: {self.dag_history.avg_duration_seconds or "N/A"}s""")
 
         # Git context
         if self.git and self.git.recent_commits:
@@ -159,7 +159,7 @@ class RCAContext(BaseModel):
             )
             sections.append(f"""## Recent Git Changes
 {commits_text}
-- Hours since last DAG change: {self.git.hours_since_last_change or 'N/A'}""")
+- Hours since last DAG change: {self.git.hours_since_last_change or "N/A"}""")
 
         # Source health
         if self.sources:
@@ -176,8 +176,8 @@ class RCAContext(BaseModel):
         # Metrics
         if self.metrics:
             sections.append(f"""## Infrastructure Metrics
-- CPU: {self.metrics.cpu_percent or 'N/A'}%
-- Memory: {self.metrics.memory_percent or 'N/A'}%
-- Disk: {self.metrics.disk_percent or 'N/A'}%""")
+- CPU: {self.metrics.cpu_percent or "N/A"}%
+- Memory: {self.metrics.memory_percent or "N/A"}%
+- Disk: {self.metrics.disk_percent or "N/A"}%""")
 
         return "\n\n".join(sections)
