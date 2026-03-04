@@ -323,7 +323,39 @@ class LLMAnalyzer:
         # Invoke LLM
         try:
             response = await self.llm.ainvoke([system_message, human_message])
-            result = self.output_parser.parse(response.content)
+            content = response.content
+            # Strip markdown code blocks that some LLMs wrap around JSON
+            if "```json" in content:
+                content = content.split("```json", 1)[1].rsplit("```", 1)[0]
+            elif "```" in content:
+                content = content.split("```", 1)[1].rsplit("```", 1)[0]
+            # Extract JSON object if surrounded by extra text
+            import json
+            import re
+
+            content = content.strip()
+            try:
+                result = self.output_parser.parse(content)
+            except Exception:
+                # Find the outermost JSON object in the response
+                match = re.search(r"\{", content)
+                if match:
+                    depth = 0
+                    start = match.start()
+                    for i in range(start, len(content)):
+                        if content[i] == "{":
+                            depth += 1
+                        elif content[i] == "}":
+                            depth -= 1
+                            if depth == 0:
+                                json_str = content[start : i + 1]
+                                parsed = json.loads(json_str, strict=False)
+                                result = LLMAnalysisResult(**parsed)
+                                break
+                    else:
+                        raise ValueError("No complete JSON object found")
+                else:
+                    raise ValueError("No JSON object found in LLM response")
         except Exception as e:
             self.logger.exception("LLM analysis failed", error=str(e))
             # Fallback to pattern-based analysis
@@ -336,10 +368,22 @@ class LLMAnalyzer:
         key_lines = self.pattern_matcher.extract_key_lines(context.logs.stdout)
 
         # Build recommendations
+        def _parse_priority(val: Any) -> int:
+            """Convert LLM priority value to int 1-5."""
+            if isinstance(val, int):
+                return max(1, min(5, val))
+            if isinstance(val, str):
+                try:
+                    return max(1, min(5, int(val)))
+                except ValueError:
+                    mapping = {"critical": 1, "immediate": 1, "high": 2, "medium": 3, "low": 4}
+                    return mapping.get(val.lower(), 3)
+            return 3
+
         recommendations = [
             Recommendation(
                 action=r.get("action", ""),
-                priority=r.get("priority", 3),
+                priority=_parse_priority(r.get("priority", 3)),
                 estimated_effort=r.get("estimated_effort"),
                 automated=r.get("automated", False),
             )

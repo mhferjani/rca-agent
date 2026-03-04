@@ -1,6 +1,7 @@
 """Output actions for RCA Agent."""
 
+from rca_agent.actions.file_writer import FileReportWriter
 from rca_agent.actions.formatters import ReportFormatter
 from rca_agent.actions.slack import SlackNotifier
 
-__all__ = ["SlackNotifier", "ReportFormatter"]
+__all__ = ["SlackNotifier", "ReportFormatter", "FileReportWriter"]

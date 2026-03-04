@@ -30,6 +30,7 @@ When a data pipeline fails in production, Data Engineers typically spend **30 mi
 - 🏷️ **Error Classification** - Automatic categorization (OOM, schema mismatch, timeout, etc.)
 - 📊 **Structured Reports** - Markdown/HTML/JSON reports with confidence scores and recommendations
 - 🔔 **Slack Notifications** - Enriched alerts with actionable context
+- 📝 **File Reports** - Automatic report generation in `reports/` directory
 - 🔌 **Extensible Architecture** - Pluggable collectors, analyzers, and LLM providers
 - 🛡️ **Fallback Analysis** - Pattern-based analysis when LLM is unavailable
 
@@ -238,11 +239,13 @@ rca-agent/
 │   │   └── reports.py
 │   ├── actions/            # Output actions
 │   │   ├── formatters.py   # Report formatters
+│   │   ├── file_writer.py  # File-based report writer
 │   │   └── slack.py
 │   └── api/
 │       └── webhook.py      # FastAPI webhook server
 ├── tests/
 ├── docs/
+├── reports/                # Generated RCA reports
 ├── demo/
 │   ├── docker-compose.yml
 │   └── dags/
@@ -285,6 +288,8 @@ make run            # Start webhook server
 
 ### Docker Demo
 
+The Docker setup uses your root `.env` file for LLM configuration.
+
 ```bash
 # Start Airflow + RCA Agent
 make docker-up
@@ -294,6 +299,15 @@ make docker-logs
 
 # Stop
 make docker-down
+```
+
+Reports are automatically written to the `reports/` directory (mounted from the Docker container).
+
+### Report Output
+
+Every analysis generates a Markdown report in `reports/`, named:
+```
+<timestamp>_<dag_id>_<task_id>_<report_id>.txt
 ```
 
 ## 📚 Documentation

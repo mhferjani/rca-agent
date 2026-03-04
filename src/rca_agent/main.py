@@ -6,7 +6,7 @@ from pathlib import Path
 import structlog
 from dotenv import load_dotenv
 
-from rca_agent.actions import ReportFormatter, SlackNotifier
+from rca_agent.actions import FileReportWriter, ReportFormatter, SlackNotifier
 from rca_agent.agent import AgentConfig, RCAWorkflow
 from rca_agent.knowledge import IncidentStore
 from rca_agent.models import FailureEvent, RCAReport
@@ -114,6 +114,11 @@ class RCAAgent:
             self._slack = SlackNotifier(config.slack_webhook_url)
 
         self._store = IncidentStore(persist_directory=config.chroma_persist_dir)
+        self._file_writer = FileReportWriter(
+            output_dir=config.reports_output_dir
+            if hasattr(config, "reports_output_dir")
+            else "./reports"
+        )
 
         self.logger.info(
             "RCA Agent initialized",
@@ -201,6 +206,9 @@ class RCAAgent:
         if report is None:
             self.logger.error("Analysis failed")
             return None
+
+        # Write report to file
+        await self._file_writer.write_report(report)
 
         # Send notification
         if notify and self._slack:

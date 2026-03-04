@@ -93,32 +93,17 @@ services:
       dockerfile: demo/Dockerfile
     depends_on:
       - airflow-webserver
+    env_file:
+      - ../.env
     environment:
       AIRFLOW_BASE_URL: http://airflow-webserver:8080
       AIRFLOW_USERNAME: admin
       AIRFLOW_PASSWORD: admin
-      # LLM Provider config
-      LLM_PROVIDER: ${LLM_PROVIDER:-anthropic}
-      # Anthropic
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-4-20250514}
-      # OpenAI
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
-      # HuggingFace
-      HUGGINGFACE_API_KEY: ${HUGGINGFACE_API_KEY:-}
-      HUGGINGFACE_MODEL: ${HUGGINGFACE_MODEL:-mistralai/Mixtral-8x7B-Instruct-v0.1}
-      # Mistral (official API)
-      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
-      MISTRAL_MODEL: ${MISTRAL_MODEL:-open-mistral-7b}
-      # Ollama
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-mistral}
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
-      # Other
       CHROMA_PERSIST_DIR: /data/chroma
     volumes:
       - rca_data:/data
       - ./dags:/opt/airflow/dags:ro
+      - ../reports:/app/reports
     ports:
       - "8000:8000"
     command: rca-agent serve --port 8000
